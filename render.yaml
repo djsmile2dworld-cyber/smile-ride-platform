@@ -25,7 +25,7 @@
       - key: JWT_EXPIRES_IN
         value: 24h
 
-  - type: static
+  - type: web
     name: smile-ride-admin
     runtime: static
     plan: free
