@@ -1,0 +1,93 @@
+const jwt = require('jsonwebtoken');
+const { User } = require('../models');
+const { cache } = require('../config/redis');
+const { pool } = require('../config/database');
+const crypto = require('crypto');
+
+const generateTokens = (user) => {
+  const accessToken = jwt.sign(
+    { userId: user.id, email: user.email, type: user.userType },
+    process.env.JWT_SECRET,
+    { expiresIn: '15m' }
+  );
+  
+  const refreshToken = jwt.sign(
+    { userId: user.id },
+    process.env.JWT_REFRESH_SECRET,
+    { expiresIn: '7d' }
+  );
+  
+  return { accessToken, refreshToken };
+};
+
+exports.register = async (req, res) => {
+  const { email, password, fullName, phone, userType = 'rider' } = req.body;
+  
+  const existing = await User.findOne({ where: { email } });
+  if (existing) {
+    return res.status(409).json({ success: false, error: 'Email already registered' });
+  }
+  
+  const user = await User.create({
+    email,
+    passwordHash: password, // Hashed in model hook
+    fullName,
+    phone,
+    userType,
+    status: userType === 'driver' ? 'pending' : 'active'
+  });
+  
+  const tokens = generateTokens(user);
+  
+  res.status(201).json({
+    success: true,
+    message: 'Registration successful',
+    user: user.toJSON(),
+    ...tokens
+  });
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  
+  const user = await User.findOne({ where: { email } });
+  if (!user || !(await user.comparePassword(password))) {
+    return res.status(401).json({ success: false, error: 'Invalid credentials' });
+  }
+  
+  if (user.status === 'suspended' || user.status === 'banned') {
+    return res.status(403).json({ success: false, error: 'Account suspended' });
+  }
+  
+  await user.update({ lastLogin: new Date() });
+  
+  const tokens = generateTokens(user);
+  
+  res.json({
+    success: true,
+    user: user.toJSON(),
+    ...tokens
+  });
+};
+
+exports.verifyToken = async (req, res) => {
+  res.json({ success: true, user: req.user });
+};
+
+exports.refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+  
+  try {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findByPk(decoded.userId);
+    
+    if (!user) throw new Error('User not found');
+    
+    const tokens = generateTokens(user);
+    res.json({ success: true, ...tokens });
+  } catch (err) {
+    res.status(401).json({ success: false, error: 'Invalid refresh token' });
+  }
+};
+
+// Other methods: forgotPassword, resetPassword, changePassword, logout, registerDevice, etc.

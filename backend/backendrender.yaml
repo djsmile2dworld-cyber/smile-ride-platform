@@ -1,0 +1,4 @@
+cd C:\Users\rukay\smile-ride-platform\backend
+
+# Check if start script exists
+Get-Content package.json | Select-String "start"

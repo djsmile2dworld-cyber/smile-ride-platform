@@ -1,0 +1,97 @@
+cd C:\Users\rukay\smile-ride-platform
+
+@"
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: smile-ride-db
+    runtime: docker
+    plan: free
+    dockerfilePath: ./database/Dockerfile
+    envVars:
+      - key: POSTGRES_USER
+        value: smileride
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+      - key: POSTGRES_DB
+        value: smile_ride
+
+  # Redis Cache
+  - type: pserv
+    name: smile-ride-redis
+    runtime: docker
+    plan: free
+    image: redis:7-alpine
+    envVars:
+      - key: REDIS_PASSWORD
+        generateValue: true
+
+  # Backend API
+  - type: web
+    name: smile-ride-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        fromService:
+          name: smile-ride-db
+          type: pserv
+          property: host
+      - key: DB_PORT
+        value: 5432
+      - key: DB_USER
+        value: smileride
+      - key: DB_PASSWORD
+        fromService:
+          name: smile-ride-db
+          type: pserv
+          envVarKey: POSTGRES_PASSWORD
+      - key: DB_NAME
+        value: smile_ride
+      - key: REDIS_HOST
+        fromService:
+          name: smile-ride-redis
+          type: pserv
+          property: host
+      - key: REDIS_PORT
+        value: 6379
+      - key: REDIS_PASSWORD
+        fromService:
+          name: smile-ride-redis
+          type: pserv
+          envVarKey: REDIS_PASSWORD
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 24h
+
+  # Admin Dashboard (Static Site)
+  - type: static
+    name: smile-ride-admin
+    runtime: static
+    plan: free
+    rootDir: admin-dashboard
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          name: smile-ride-api
+          type: web
+          property: url
+
+  # Frontend Website (if you have the original HTML)
+  - type: static
+    name: smile-ride-website
+    runtime: static
+    plan: free
+    rootDir: website
+    staticPublishPath: ./
+"@ | Out-File -FilePath render.yaml -Encoding utf8

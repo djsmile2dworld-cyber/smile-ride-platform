@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased bg-gray-900 text-white;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-gray-800/50 backdrop-blur-md border border-gray-700/50 rounded-xl;
+  }
+  
+  .btn-primary {
+    @apply bg-brand-yellow text-gray-900 font-semibold px-4 py-2 rounded-lg 
+           hover:bg-brand-yellow-dark transition-colors active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-700 text-white font-medium px-4 py-2 rounded-lg 
+           hover:bg-gray-600 transition-colors;
+  }
+  
+  .status-badge {
+    @apply px-2 py-1 rounded-full text-xs font-medium;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
+
+/* Map custom markers */
+.custom-driver-marker {
+  @apply transition-transform duration-300;
+}
+
+.leaflet-popup-content-wrapper {
+  @apply bg-gray-800 text-white rounded-lg border border-gray-700;
+}
+
+.leaflet-popup-tip {
+  @apply bg-gray-800;
+}
