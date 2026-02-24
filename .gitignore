@@ -1,6 +1,7 @@
-node_modules/
+﻿node_modules/
 .env
 .env.prod
 .nixpacks/
 Dockerfile
+railway.json
 railway.toml
