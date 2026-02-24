@@ -1,0 +1,8 @@
+﻿{
+  "name": "smile-ride-platform",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "sh start.sh",
+    "install": "cd backend && npm install"
+  }
+}

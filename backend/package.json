@@ -1,23 +1,14 @@
 ﻿{
   "name": "smile-ride-backend",
   "version": "1.0.0",
-  "description": "Smile Ride Backend API",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "start": "node src/app.js"
   },
   "dependencies": {
     "express": "^4.18.2",
     "pg": "^8.11.3",
-    "redis": "^4.6.5",
-    "jsonwebtoken": "^9.0.0",
-    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "helmet": "^7.0.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
+    "dotenv": "^16.0.3"
   }
 }

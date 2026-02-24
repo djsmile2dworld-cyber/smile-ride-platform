@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs"]
 
 [phases.build]
-cmds = ["cd backend && npm install"]
+cmds = ["npm run install"]
 
 [start]
-cmd = "cd backend && node src/app.js"
+cmd = "npm start"
